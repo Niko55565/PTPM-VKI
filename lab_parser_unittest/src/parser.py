@@ -23,6 +23,7 @@ class ForumParser:
             headers=self.HEADERS,
             timeout=10
         )
+
         response.raise_for_status()
 
         return self.parse_html(response.text)
@@ -34,24 +35,21 @@ class ForumParser:
         soup = BeautifulSoup(html, "lxml")
         parsed_data = []
 
-        for comment in soup.select(".comment"):
-            comment_id = comment.get("data-comment-id")
-            author = comment.select_one(".author")
-            message = comment.select_one(".message")
+        for index, quote in enumerate(
+                soup.select(".quote"),
+                start=1
+        ):
+            author = quote.select_one(".author")
+            message = quote.select_one(".text")
 
-            if comment_id is None or author is None or message is None:
-                continue
-
-            try:
-                comment_id = int(comment_id)
-            except ValueError:
+            if author is None or message is None:
                 continue
 
             parsed_data.append(
                 {
-                    "id": comment_id,
+                    "id": index,
                     "name": author.get_text(strip=True),
-                    "message": message.decode_contents().strip()
+                    "message": message.get_text(strip=True)
                 }
             )
 
@@ -66,6 +64,7 @@ class ForumParser:
                 item["name"],
                 item["message"]
             )
+
             saved_count += 1
 
         return saved_count

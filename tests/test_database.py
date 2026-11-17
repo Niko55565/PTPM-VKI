@@ -1,7 +1,7 @@
 import sqlite3
 import unittest
 
-from src.database import DatabaseRepository
+from lab_parser_unittest.src.database import DatabaseRepository
 
 
 class DatabaseRepositoryTests(unittest.TestCase):
